@@ -1,7 +1,18 @@
+#include "Commands/CreateCommand.h"
+#include "Commands/AppendCommand.h"
+#include "Commands/ExtractCommand.h"
+#include "Commands/DeleteCommand.h"
+#include "Parsers/Parser.h"
+#include "Parsers/OptionParsers/CommandParser.h"
+#include "Parsers/OptionParsers/CommandsParser.h"
+#include "Parsers/OptionParsers/ArchiveNameParser.h"
+#include "Parsers/ArgumentParsers/FileNameParser.h"
+#include "Parsers/ArgumentParsers/MergedArchivesNameParser.h"
+#include "Builders/CommandBuilder.hpp"
+#include "Builders/CommandWithFileNameBuilder.h"
+#include "Builders/ConcatenateCommandBuilder.h"
+#include "Builders/ListCommandBuilder.h"
 #include <iostream>
-#include <string>
-#include <cstring>
-#include "lib/archiver.h"
 
 /*
 header:
@@ -15,73 +26,56 @@ offset3 36
 ...
  */
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
+   Parser parser;
+   auto* commandsParser = new CommandsParser;
 
-    if (argc <= 2) {
-        std::cerr << "Not enough arguments\n";
-        return 1;
-    }
+   commandsParser
+           ->AddCommand(new CommandParser<CommandWithFileNameBuilder<CreateCommand>>(
+                   new FileNameParser<CommandWithFileNameBuilder<CreateCommand>>(),
+                   "create",
+                   'c'))
+           ->AddNextParser(new CommandParser<ListCommandBuilder>(
+                   "list",
+                   'l'))
+           ->AddNextParser(new CommandParser<CommandWithFileNameBuilder<ExtractCommand>>(
+                   new FileNameParser<CommandWithFileNameBuilder<ExtractCommand>>(),
+                   "extract",
+                   'x'))
+           ->AddNextParser(new CommandParser<CommandWithFileNameBuilder<AppendCommand>>(
+                   new FileNameParser<CommandWithFileNameBuilder<AppendCommand>>(),
+                   "append",
+                   'a'))
+           ->AddNextParser(new CommandParser<CommandWithFileNameBuilder<DeleteCommand>>(
+                   new FileNameParser<CommandWithFileNameBuilder<DeleteCommand>>(),
+                   "delete",
+                   'd'))
+           ->AddNextParser(new CommandParser<ConcatenateCommandBuilder>(
+                   new MergedArchivesNameParser(),
+                   "concatenate",
+                   'A'));
 
-    std::vector<std::string> files;
-    std::string archive_name;
-    std::string extract_file_name;
-    std::string delete_file_name;
-    std::string append_file_name;
-    std::string merge_1archive_name;
-    std::string merge_2archive_name;
-    bool flag_of_create = false;
-    bool flag_of_extract = false;
-    bool flag_of_list = false;
-    unsigned control_bits = 4;
+   parser.AddOption(new ArchiveNameParser)
+           ->AddNextParser(commandsParser);
 
-    std::string s;
-    for (int i = 1; i < argc; i++) {
-        s = argv[i];
-        if (s == "--create" || s == "-c") {
-            flag_of_create = true;
-        } else if (!strncmp(argv[i], "--file=", 7)) {
-            while (*argv[i] != '=') argv[i]++;
-            argv[i]++;
-            archive_name = argv[i];
-        } else if (s == "-f") {
-            archive_name = argv[++i];
-        } else if (s == "--list" || s == "-l") {
-            flag_of_list = true;
-        } else if (s == "--extract" || s == "-x") {
-            flag_of_extract = true;
-        } else if (s == "--append" || s == "-a") {
-            append_file_name = argv[++i];
-        } else if (s == "--delete" || s == "-d") {
-            delete_file_name = argv[++i];
-        } else if (s == "--concatenate" || s == "-A") {
-            merge_1archive_name = argv[++i];
-            merge_2archive_name = argv[++i];
-        } else if (s == "--control_bits" || s == "-b") {
-            control_bits = strtoul(argv[++i], nullptr, 10);
-        } else if (flag_of_create) {
-            files.push_back(s);
-        } else if (flag_of_extract) {
-            extract_file_name = argv[i];
-        }
-    }
+   if (argc == 1) {
+       std::cout << "No arguments provided" << std::endl;
+       return 0;
+   }
 
-    archive_name += ".haf";
+   CommandBuilder* commandBuilder = parser.Parse(std::vector<std::string>(argv + 1, argv + argc));
 
-    if (flag_of_create) {
-        Create(archive_name, files, control_bits);
-    } else if (flag_of_list) {
-        List(archive_name);
-    } else if (flag_of_extract) {
-        if (extract_file_name.empty())
-            Extract(archive_name);
-        else
-            Extract(archive_name, extract_file_name);
-    } else if (!delete_file_name.empty()) {
-        Delete(archive_name, delete_file_name);
-    } else if (!append_file_name.empty()) {
-        Append(archive_name, append_file_name);
-    } else if (!merge_1archive_name.empty()) {
-        Merge(archive_name, merge_1archive_name, merge_2archive_name);
-    }
-    return 0;
+   if (commandBuilder == nullptr) {
+       std::cout << "Invalid arguments" << std::endl;
+       return 0;
+   }
+
+   std::string errors = commandBuilder->ShowErrors();
+   if (!errors.empty()) {
+       std::cout << errors << std::endl;
+       return 0;
+   }
+
+   commandBuilder->TryBuild()->Execute();
+   return 0;   
 }
