@@ -1,13 +1,14 @@
 #pragma once
 
 #include "ChainLinkParser.hpp"
+#include <memory>
 
 class Parser{
 public:
-    CommandBuilder* Parse(std::vector<std::string> request);
+    std::unique_ptr<CommandBuilder> Parse(std::vector<std::string> request);
 
-    ChainLinkParser* AddOption(ChainLinkParser* parser);
+    ChainLinkParser& AddOption(std::unique_ptr<ChainLinkParser> parser);
 
 private:
-    ChainLinkParser* optionParser_ = nullptr;
+    std::unique_ptr<ChainLinkParser> optionParser_ = nullptr;
 };

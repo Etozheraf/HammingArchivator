@@ -12,16 +12,13 @@ concept BuilderWithFileName = DerivedFromCommandBuilder<Builder>
 template<BuilderWithFileName Builder>
 class FileNameParser : public ChainLinkParserBase {
 public:
-    bool Parse(std::vector<std::string>& request, CommandBuilder*& builder) override;
-};
-
-template<BuilderWithFileName Builder>
-bool FileNameParser<Builder>::Parse(std::vector<std::string>& request, CommandBuilder*& builder) {
-    auto* concreteBuilder = dynamic_cast<Builder*>(builder);
-    if (concreteBuilder == nullptr) {
-        return false;
+    bool Parse(std::vector<std::string>& request, std::unique_ptr<CommandBuilder>& builder) override {
+        auto* concreteBuilder = dynamic_cast<Builder*>(builder.get());
+        if (concreteBuilder == nullptr) {
+            return false;
+        }
+        concreteBuilder->SetFileNames(request);
+        request.clear();
+        return true;
     }
-    concreteBuilder->SetFileNames(request);
-    request.clear();
-    return true;
-}
+};

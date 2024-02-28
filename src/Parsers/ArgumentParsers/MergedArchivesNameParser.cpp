@@ -1,7 +1,10 @@
 #include "MergedArchivesNameParser.h"
 
-bool MergedArchivesNameParser::Parse(std::vector<std::string>& request, CommandBuilder*& builder) {
-    auto* concatenateBuilder = dynamic_cast<ConcatenateCommandBuilder*>(builder);
+bool MergedArchivesNameParser::Parse(std::vector<std::string>& request, std::unique_ptr<CommandBuilder>& builder) {
+    if (isSet) return false;
+    isSet = true;
+
+    auto* concatenateBuilder(dynamic_cast<ConcatenateCommandBuilder*>(builder.get()));
 
     if (concatenateBuilder == nullptr || request.size() < 2) {
         return false;

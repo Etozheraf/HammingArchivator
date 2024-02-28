@@ -1,15 +1,15 @@
 #include "CommandsParser.h"
 
-bool CommandsParser::Parse(std::vector<std::string>& request, CommandBuilder*& builder) {
+bool CommandsParser::Parse(std::vector<std::string>& request, std::unique_ptr<CommandBuilder>& builder) {
     if (!is_chosen_) {
         std::string parsed_word = request[0];
-        ChainLinkParser* argumentParser = commands_->Parse(request, builder);
+        std::unique_ptr<ChainLinkParser> argumentParser = std::move(commands_->Parse(request, builder, false));
 
         if (request.empty()) return true;
 
         if (parsed_word != request[0]) {
             is_chosen_ = true;
-            AddNextParser(argumentParser);
+            AddNextParser(std::move(argumentParser));
             commands_->Parse(request, builder, true);
             return true;
         }
@@ -19,10 +19,10 @@ bool CommandsParser::Parse(std::vector<std::string>& request, CommandBuilder*& b
     return next_parser_->Parse(request, builder);
 }
 
-CommandChainLinkParser* CommandsParser::AddCommand(CommandChainLinkParser* parser) {
+CommandChainLinkParser& CommandsParser::AddCommand(std::unique_ptr<CommandChainLinkParser> parser) {
     if (commands_ == nullptr) {
-        commands_ = parser;
-        return parser;
+        commands_ = std::move(parser);
+        return *commands_;
     }
-    return commands_->AddNextParser(parser);
+    return commands_->AddNextParser(std::move(parser));
 }

@@ -9,7 +9,12 @@ public:
         archiveName_ = archiveName;
         return *this;
     }
-    virtual std::string ShowErrors() {return "";}
+    virtual std::string ShowErrors() {
+        if (archiveName_.empty()) {
+            return "Archive name is empty\n";
+        }
+        return "";
+    }
 
     virtual Command* TryBuild() {return nullptr;}
 

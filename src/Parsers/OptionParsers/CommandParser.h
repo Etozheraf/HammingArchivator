@@ -8,13 +8,13 @@ public:
     explicit CommandParser(std::string command, char short_command) :
             argument_parser_(nullptr), command_(std::move(command)), short_command_(short_command) {}
 
-    explicit CommandParser(ChainLinkParser* argument_parser, std::string command, char short_command) :
-            argument_parser_(argument_parser),
+    explicit CommandParser(std::unique_ptr<ChainLinkParser> argument_parser, std::string command, char short_command) :
+            argument_parser_(std::move(argument_parser)),
             command_(std::move(command)),
             short_command_(short_command) {}
 
-    ChainLinkParser*
-    Parse(std::vector<std::string>& request, CommandBuilder*& builder, bool is_command_created) override {
+    std::unique_ptr<ChainLinkParser>
+    Parse(std::vector<std::string>& request, std::unique_ptr<CommandBuilder>& builder, bool is_command_created) override {
         bool is_command = false;
         std::string short_command = "-";
         short_command += short_command_;
@@ -30,21 +30,21 @@ public:
         }
 
         if (is_command && !is_command_created) {
-            builder = new Builder(*builder);
+            builder = std::make_unique<Builder>(*builder);
             is_command_created = true;
         }
 
-        ChainLinkParser* argument_parser = nullptr;
+        std::unique_ptr<ChainLinkParser> argument_parser = nullptr;
         if (next_parser_ != nullptr)
             argument_parser = next_parser_->Parse(request, builder, is_command_created);
 
         if (is_command_created)
-            return argument_parser_;
-        return argument_parser;
+            return std::move(argument_parser_);
+        return std::move(argument_parser);
     }
 
 private:
-    ChainLinkParser* argument_parser_;
+    std::unique_ptr<ChainLinkParser> argument_parser_;
     std::string command_;
     char short_command_;
 };

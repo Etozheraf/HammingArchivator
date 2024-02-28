@@ -5,23 +5,23 @@
 
 struct CommandChainLinkParser {
 
-    virtual ChainLinkParser* Parse(std::vector<std::string>& request, CommandBuilder*& builder, bool is_command_created = false) = 0;
+    virtual std::unique_ptr<ChainLinkParser> Parse(std::vector<std::string>& request, std::unique_ptr<CommandBuilder>& builder, bool is_command_created) = 0;
 
-    virtual CommandChainLinkParser* AddNextParser(CommandChainLinkParser* parser) = 0;
+    virtual CommandChainLinkParser& AddNextParser(std::unique_ptr<CommandChainLinkParser> parser) = 0;
 };
 
 class CommandChainLinkParserBase : public CommandChainLinkParser {
 public:
-    CommandChainLinkParser* AddNextParser(CommandChainLinkParser* parser) override {
+    CommandChainLinkParser& AddNextParser(std::unique_ptr<CommandChainLinkParser> parser) override {
         if (next_parser_ == nullptr) {
-            next_parser_ = parser;
-            return parser;
+            next_parser_ = std::move(parser);
+            return *next_parser_;
         }
-        return next_parser_->AddNextParser(parser);
+        return next_parser_->AddNextParser(std::move(parser));
     };
 
     virtual ~CommandChainLinkParserBase() = default;
 
 protected:
-    CommandChainLinkParser* next_parser_ = nullptr;
+    std::unique_ptr<CommandChainLinkParser> next_parser_ = nullptr;
 };

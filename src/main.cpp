@@ -13,6 +13,7 @@
 #include "Builders/ConcatenateCommandBuilder.h"
 #include "Builders/ListCommandBuilder.h"
 #include <iostream>
+#include <memory>
 
 /*
 header:
@@ -27,55 +28,56 @@ offset3 36
  */
 
 int main(int argc, char* argv[]) {
-   Parser parser;
-   auto* commandsParser = new CommandsParser;
+    Parser parser;
+    std::unique_ptr<CommandsParser> commandsParser = std::make_unique<CommandsParser>();
 
-   commandsParser
-           ->AddCommand(new CommandParser<CommandWithFileNameBuilder<CreateCommand>>(
-                   new FileNameParser<CommandWithFileNameBuilder<CreateCommand>>(),
-                   "create",
-                   'c'))
-           ->AddNextParser(new CommandParser<ListCommandBuilder>(
-                   "list",
-                   'l'))
-           ->AddNextParser(new CommandParser<CommandWithFileNameBuilder<ExtractCommand>>(
-                   new FileNameParser<CommandWithFileNameBuilder<ExtractCommand>>(),
-                   "extract",
-                   'x'))
-           ->AddNextParser(new CommandParser<CommandWithFileNameBuilder<AppendCommand>>(
-                   new FileNameParser<CommandWithFileNameBuilder<AppendCommand>>(),
-                   "append",
-                   'a'))
-           ->AddNextParser(new CommandParser<CommandWithFileNameBuilder<DeleteCommand>>(
-                   new FileNameParser<CommandWithFileNameBuilder<DeleteCommand>>(),
-                   "delete",
-                   'd'))
-           ->AddNextParser(new CommandParser<ConcatenateCommandBuilder>(
-                   new MergedArchivesNameParser(),
-                   "concatenate",
-                   'A'));
+    commandsParser
+            ->AddCommand(std::make_unique<CommandParser<CommandWithFileNameBuilder<CreateCommand>>>(
+                    std::make_unique<FileNameParser<CommandWithFileNameBuilder<CreateCommand>>>(),
+                    "create",
+                    'c'))
+            .AddNextParser(std::make_unique<CommandParser<ListCommandBuilder>>(
+                    "list",
+                    'l'))
+            .AddNextParser(std::make_unique<CommandParser<CommandWithFileNameBuilder<ExtractCommand>>>(
+                    std::make_unique<FileNameParser<CommandWithFileNameBuilder<ExtractCommand>>>(),
+                    "extract",
+                    'x'))
+            .AddNextParser(std::make_unique<CommandParser<CommandWithFileNameBuilder<AppendCommand>>>(
+                    std::make_unique<FileNameParser<CommandWithFileNameBuilder<AppendCommand>>>(),
+                    "append",
+                    'a'))
+            .AddNextParser(std::make_unique<CommandParser<CommandWithFileNameBuilder<DeleteCommand>>>(
+                    std::make_unique<FileNameParser<CommandWithFileNameBuilder<DeleteCommand>>>(),
+                    "delete",
+                    'd'))
+            .AddNextParser(std::make_unique<CommandParser<ConcatenateCommandBuilder>>(
+                    std::make_unique<MergedArchivesNameParser>(),
+                    "concatenate",
+                    'A'));
 
-   parser.AddOption(new ArchiveNameParser)
-           ->AddNextParser(commandsParser);
+    parser
+            .AddOption(std::make_unique<ArchiveNameParser>())
+            .AddNextParser(std::move(commandsParser));
 
-   if (argc == 1) {
-       std::cout << "No arguments provided" << std::endl;
-       return 0;
-   }
+    if (argc == 1) {
+        std::cout << "No arguments provided" << std::endl;
+        return 0;
+    }
 
-   CommandBuilder* commandBuilder = parser.Parse(std::vector<std::string>(argv + 1, argv + argc));
+    std::unique_ptr<CommandBuilder> commandBuilder = std::move(parser.Parse(std::vector<std::string>(argv + 1, argv + argc)));
 
-   if (commandBuilder == nullptr) {
-       std::cout << "Invalid arguments" << std::endl;
-       return 0;
-   }
+    if (commandBuilder == nullptr) {
+        std::cout << "Invalid arguments" << std::endl;
+        return 0;
+    }
 
-   std::string errors = commandBuilder->ShowErrors();
-   if (!errors.empty()) {
-       std::cout << errors << std::endl;
-       return 0;
-   }
+    std::string errors = commandBuilder->ShowErrors();
+    if (!errors.empty()) {
+        std::cout << errors << std::endl;
+        return 0;
+    }
 
-   commandBuilder->TryBuild()->Execute();
-   return 0;   
+    commandBuilder->TryBuild()->Execute();
+    return 0;
 }

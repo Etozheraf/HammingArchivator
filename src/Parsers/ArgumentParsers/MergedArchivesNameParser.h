@@ -4,5 +4,8 @@
 #include "../../Builders/ConcatenateCommandBuilder.h"
 
 class MergedArchivesNameParser : public ChainLinkParserBase {
-    bool Parse(std::vector<std::string> &request, CommandBuilder *&builder) override;
+public:
+    bool Parse(std::vector<std::string>& request, std::unique_ptr<CommandBuilder>& builder) override;
+private:
+    bool isSet = false;
 };

@@ -1,6 +1,6 @@
 #include "ArchiveNameParser.h"
 
-bool ArchiveNameParser::Parse(std::vector<std::string> &request, CommandBuilder *&builder) {
+bool ArchiveNameParser::Parse(std::vector<std::string>& request, std::unique_ptr<CommandBuilder>& builder) {
     if (request[0].starts_with("--file=")) {
         builder->SetArchiveName(request[0].substr(7));
         request.erase(request.begin());
