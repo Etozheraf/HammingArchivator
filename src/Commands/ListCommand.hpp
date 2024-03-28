@@ -5,10 +5,10 @@
 
 class ListCommand : public Command {
 public:
-    explicit ListCommand(std::string archiveName);
+    explicit ListCommand(std::string archive_name);
 
-    void Execute() override;
+    std::string Execute() override;
 
 private:
-    std::string archiveName_;
+    std::string archive_name_;
 };

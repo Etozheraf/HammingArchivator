@@ -5,15 +5,15 @@
 
 class ConcatenateCommand : public Command {
 public:
-    explicit ConcatenateCommand(std::string firstArchiveName,
-                                std::string secondArchiveName,
-                                std::string resultArchiveName);
+    explicit ConcatenateCommand(std::string first_archive_name,
+                                std::string second_archive_name,
+                                std::string result_archive_name);
 
-    void Execute() override;
+    std::string Execute() override;
 
 private:
-    std::string firstArchiveName_;
-    std::string secondArchiveName_;
+    std::string first_archive_name_;
+    std::string second_archive_name_;
 
-    std::string resultArchiveName_;
+    std::string result_archive_name_;
 };

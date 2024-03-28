@@ -1,7 +1,7 @@
 #include "Parser.h"
 
 std::unique_ptr<CommandBuilder> Parser::Parse(std::vector<std::string> request) {
-    if (optionParser_ == nullptr) {
+    if (option_parser_ == nullptr) {
         return nullptr;
     }
 
@@ -9,7 +9,7 @@ std::unique_ptr<CommandBuilder> Parser::Parse(std::vector<std::string> request) 
     auto copy(builder.get());
 
     while (!request.empty()) {
-        if (!optionParser_->Parse(request, builder)) {
+        if (!option_parser_->Parse(request, builder)) {
             break;
         }
     }
@@ -22,11 +22,11 @@ std::unique_ptr<CommandBuilder> Parser::Parse(std::vector<std::string> request) 
 }
 
 ChainLinkParser& Parser::AddOption(std::unique_ptr<ChainLinkParser> parser) {
-    if (optionParser_ == nullptr) {
-        optionParser_ = std::move(parser);
-        return *optionParser_;
+    if (option_parser_ == nullptr) {
+        option_parser_ = std::move(parser);
+        return *option_parser_;
     }
-    return optionParser_->AddNextParser(std::move(parser));
+    return option_parser_->AddNextParser(std::move(parser));
 }
 
 

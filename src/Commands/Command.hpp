@@ -3,9 +3,8 @@
 #include <type_traits>
 #include <iostream>
 
-
 struct Command{
-    virtual void Execute() = 0;
+    virtual std::string Execute() = 0;
 };
 
 template<class C>

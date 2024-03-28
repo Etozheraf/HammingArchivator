@@ -1,6 +1,14 @@
+#include <cstdint>
 
 class Queue {
 public:
+    Queue(uint32_t l) {
+        length = l;
+        bit = new bool[l];
+        head = 0;
+        tail = 0;
+    }
+
     void push(bool b) {
         bit[tail] = b;
         if (tail == length - 1)
@@ -25,12 +33,7 @@ public:
             return tail + length - head;
     }
 
-    Queue(uint32_t l) {
-        length = l;
-        bit = new bool[l];
-        head = 0;
-        tail = 0;
-    }
+
 
     bool *bit;
     uint32_t head;

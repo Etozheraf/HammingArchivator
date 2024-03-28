@@ -5,12 +5,12 @@
 
 class CommandBuilder {
 public:
-    CommandBuilder& SetArchiveName(const std::string& archiveName) {
-        archiveName_ = archiveName;
+    CommandBuilder& SetArchiveName(const std::string& archive_name) {
+        archive_name_ = archive_name;
         return *this;
     }
     virtual std::string ShowErrors() {
-        if (archiveName_.empty()) {
+        if (archive_name_.empty()) {
             return "Archive name is empty\n";
         }
         return "";
@@ -19,7 +19,7 @@ public:
     virtual Command* TryBuild() {return nullptr;}
 
 protected:
-    std::string archiveName_;
+    std::string archive_name_;
 };
 
 template<class Builder>

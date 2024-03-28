@@ -7,15 +7,15 @@ public:
 
     explicit ConcatenateCommandBuilder(const CommandBuilder& c) : CommandBuilder(c) {};
 
-    ConcatenateCommandBuilder& SetFirstArchiveName(const std::string& firstArchiveName);
+    ConcatenateCommandBuilder& SetFirstArchiveName(const std::string& first_archive_name);
 
-    ConcatenateCommandBuilder& SetSecondArchiveName(const std::string& secondArchiveName);
+    ConcatenateCommandBuilder& SetSecondArchiveName(const std::string& second_archive_name);
 
     std::string ShowErrors() override;
 
     Command* TryBuild() override;
 
 private:
-    std::string firstArchiveName_;
+    std::string first_archive_name_;
     std::string secondArchiveName_;
 };

@@ -10,5 +10,5 @@ public:
     ChainLinkParser& AddOption(std::unique_ptr<ChainLinkParser> parser);
 
 private:
-    std::unique_ptr<ChainLinkParser> optionParser_ = nullptr;
+    std::unique_ptr<ChainLinkParser> option_parser_ = nullptr;
 };

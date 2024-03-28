@@ -1,8 +1,8 @@
 #include "ListCommand.hpp"
 #include <string>
 
-ListCommand::ListCommand(std::string archiveName) : archiveName_(std::move(archiveName)) {}
+ListCommand::ListCommand(std::string archive_name) : archive_name_(std::move(archive_name)) {}
 
-void ListCommand::Execute() {
-    std::cout << "Listing files from archive " << archiveName_ << ": ";
+std::string ListCommand::Execute() {
+    std::cout << "Listing files from archive " << archive_name_ << ": ";
 }

@@ -18,8 +18,8 @@
 /*
 header:
 HAF 3
-control bits 7
-offset1 11
+control bits 4
+offset1 4
 filename1 22 17
 offset2 26 21
 filename2 32
@@ -29,9 +29,9 @@ offset3 36
 
 int main(int argc, char* argv[]) {
     Parser parser;
-    std::unique_ptr<CommandsParser> commandsParser = std::make_unique<CommandsParser>();
+    std::unique_ptr<CommandsParser> commands_parser = std::make_unique<CommandsParser>();
 
-    commandsParser
+    commands_parser
             ->AddCommand(std::make_unique<CommandParser<CommandWithFileNameBuilder<CreateCommand>>>(
                     std::make_unique<FileNameParser<CommandWithFileNameBuilder<CreateCommand>>>(),
                     "create",
@@ -58,26 +58,29 @@ int main(int argc, char* argv[]) {
 
     parser
             .AddOption(std::make_unique<ArchiveNameParser>())
-            .AddNextParser(std::move(commandsParser));
+            .AddNextParser(std::move(commands_parser));
 
     if (argc == 1) {
         std::cout << "No arguments provided" << std::endl;
         return 0;
     }
 
-    std::unique_ptr<CommandBuilder> commandBuilder = std::move(parser.Parse(std::vector<std::string>(argv + 1, argv + argc)));
+    std::unique_ptr<CommandBuilder> command_builder = std::move(parser.Parse(std::vector<std::string>(argv + 1, argv + argc)));
 
-    if (commandBuilder == nullptr) {
+    if (command_builder == nullptr) {
         std::cout << "Invalid arguments" << std::endl;
         return 0;
     }
 
-    std::string errors = commandBuilder->ShowErrors();
+    std::string errors = command_builder->ShowErrors();
     if (!errors.empty()) {
         std::cout << errors << std::endl;
         return 0;
     }
 
-    commandBuilder->TryBuild()->Execute();
+    errors = command_builder->TryBuild()->Execute();
+    if (!errors.empty()) {
+        std::cout << errors << '\n';
+    }
     return 0;
 }

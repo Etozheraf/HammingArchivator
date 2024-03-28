@@ -2,23 +2,23 @@
 #include "../Commands/ConcatenateCommand.h"
 
 ConcatenateCommandBuilder& ConcatenateCommandBuilder::SetFirstArchiveName(
-        const std::string& firstArchiveName) {
-    firstArchiveName_ = firstArchiveName;
+        const std::string& first_archive_name) {
+    first_archive_name_ = first_archive_name;
     return *this;
 }
 
 ConcatenateCommandBuilder& ConcatenateCommandBuilder::SetSecondArchiveName(
-        const std::string& secondArchiveName) {
-    secondArchiveName_ = secondArchiveName;
+        const std::string& second_archive_name) {
+    secondArchiveName_ = second_archive_name;
     return *this;
 }
 
 std::string ConcatenateCommandBuilder::ShowErrors() {
     std::string errors;
-    if (archiveName_.empty()) {
+    if (archive_name_.empty()) {
         errors += "Archive name is empty\n";
     }
-    if (firstArchiveName_.empty()) {
+    if (first_archive_name_.empty()) {
         errors += "First archive name is empty\n";
     }
     if (secondArchiveName_.empty()) {
@@ -28,8 +28,8 @@ std::string ConcatenateCommandBuilder::ShowErrors() {
 }
 
 Command* ConcatenateCommandBuilder::TryBuild() {
-    if (archiveName_.empty() || firstArchiveName_.empty() || secondArchiveName_.empty()) {
+    if (archive_name_.empty() || first_archive_name_.empty() || secondArchiveName_.empty()) {
         return nullptr;
     }
-    return new ConcatenateCommand(firstArchiveName_, secondArchiveName_, archiveName_);
+    return new ConcatenateCommand(first_archive_name_, secondArchiveName_, archive_name_);
 }

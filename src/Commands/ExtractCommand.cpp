@@ -1,12 +1,12 @@
 #include "ExtractCommand.h"
 
-ExtractCommand::ExtractCommand(std::string archiveName, std::vector<std::string> fileNames)  :
-        archiveName_(std::move(archiveName)),
-        fileNames_(std::move(fileNames)) {}
+ExtractCommand::ExtractCommand(std::string archive_name, std::vector<std::string> file_names)  :
+        archive_name_(std::move(archive_name)),
+        file_names_(std::move(file_names)) {}
 
-void ExtractCommand::Execute() {
-    std::cout << "Extracting files from archive " << archiveName_ << ": ";
-    for (const auto& fileName : fileNames_) {
+std::string ExtractCommand::Execute() {
+    std::cout << "Extracting files from archive " << archive_name_ << ": ";
+    for (const auto& fileName : file_names_) {
         std::cout << fileName << ", ";
     }
 }

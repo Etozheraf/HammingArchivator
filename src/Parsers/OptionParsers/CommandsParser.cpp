@@ -3,13 +3,13 @@
 bool CommandsParser::Parse(std::vector<std::string>& request, std::unique_ptr<CommandBuilder>& builder) {
     if (!is_chosen_) {
         std::string parsed_word = request[0];
-        std::unique_ptr<ChainLinkParser> argumentParser = std::move(commands_->Parse(request, builder, false));
+        std::unique_ptr<ChainLinkParser> argument_parser = std::move(commands_->Parse(request, builder, false));
 
         if (request.empty()) return true;
 
         if (parsed_word != request[0]) {
             is_chosen_ = true;
-            AddNextParser(std::move(argumentParser));
+            AddNextParser(std::move(argument_parser));
             commands_->Parse(request, builder, true);
             return true;
         }

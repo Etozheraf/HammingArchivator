@@ -6,11 +6,11 @@
 
 class ExtractCommand : public Command {
 public:
-    explicit ExtractCommand(std::string archiveName, std::vector<std::string> fileNames);
+    explicit ExtractCommand(std::string archive_name, std::vector<std::string> file_names);
 
-    void Execute() override;
+    std::string Execute() override;
 
 private:
-    std::string archiveName_;
-    std::vector<std::string> fileNames_;
+    std::string archive_name_;
+    std::vector<std::string> file_names_;
 };

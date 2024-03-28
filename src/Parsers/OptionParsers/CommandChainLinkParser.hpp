@@ -5,7 +5,9 @@
 
 struct CommandChainLinkParser {
 
-    virtual std::unique_ptr<ChainLinkParser> Parse(std::vector<std::string>& request, std::unique_ptr<CommandBuilder>& builder, bool is_command_created) = 0;
+    virtual std::unique_ptr<ChainLinkParser> Parse(std::vector<std::string>& request,
+                                                   std::unique_ptr<CommandBuilder>& builder,
+                                                   bool is_command_created) = 0;
 
     virtual CommandChainLinkParser& AddNextParser(std::unique_ptr<CommandChainLinkParser> parser) = 0;
 };

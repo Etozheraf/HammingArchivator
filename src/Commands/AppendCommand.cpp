@@ -1,12 +1,12 @@
 #include "AppendCommand.h"
 
-AppendCommand::AppendCommand(std::string archiveName, std::vector<std::string> fileNames) :
-        archiveName_(std::move(archiveName)),
-        fileNames_(std::move(fileNames)) {}
+AppendCommand::AppendCommand(std::string archive_name, std::vector<std::string> file_names) :
+        archive_name_(std::move(archive_name)),
+        file_names_(std::move(file_names)) {}
 
-void AppendCommand::Execute() {
-    std::cout << "Appending files to archive " << archiveName_ << ": ";
-    for (const auto& fileName : fileNames_) {
+std::string AppendCommand::Execute() {
+    std::cout << "Appending files to archive " << archive_name_ << ": ";
+    for (const auto& fileName : file_names_) {
         std::cout << fileName << ", ";
     }
 }
