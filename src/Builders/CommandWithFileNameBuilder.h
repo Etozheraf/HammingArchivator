@@ -14,7 +14,7 @@ public:
 
     DerivedCommand* TryBuild() override;
 
-private:
+protected:
     std::vector<std::string> file_names_;
 };
 
