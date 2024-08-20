@@ -1,9 +1,10 @@
 #include "CreateCommand.h"
 #include "Queue.h"
-#include "../Archivator/Converter.h"
-#include "../Archivator/HammingCoder.h"
-#include "../Archivator/ThreeBitsCoder.h"
+#include "../Coder/Converter.h"
+#include "../Coder/HammingCoder.h"
+#include "../Coder/ThreeBitsCoder.h"
 #include <memory>
+#include <optional>
 
 /*
 header:
@@ -29,22 +30,23 @@ CreateCommand::CreateCommand(std::string archive_name, int control_bits,
 
 std::string CreateCommand::Execute() {
 
-    uint64_t offset = 3 + 4 + 4; // for HAF, control bits, file size
+    uint64_t header_size = 3 + 4 + 4; // for HAF, control bits, file size
 
     for (auto& filename: file_names_) {
-        offset += filename.size() + 1 + 4; // for name, '/0', offset
+        header_size += filename.size() + 1 + 4; // for name, '/0', header_size
     }
 
     std::ofstream archive(archive_name_, std::ofstream::binary);
     Converter converter(std::make_unique<ThreeBitsCoder>());
 
-    PrintInArchive(archive, converter.TryConvert('H'));
-    PrintInArchive(archive, converter.TryConvert('A'));
-    PrintInArchive(archive, converter.TryConvert('F'));
+    PrintInArchive(archive, converter.TryConvert("HAF", 3));
     
     PrintInArchive(archive, converter.TryConvert(control_bits_));
 
-    std::vector<uint32_t> file_sizes;
+    PrintInArchive(archive, converter.TryConvert(header_size));
+
+    std::vector<uint64_t> file_sizes;
+    file_sizes.reserve(file_names_.size());
     for (auto& filename: file_names_) {
         std::ifstream file(filename, std::ofstream::binary);
 
@@ -52,8 +54,6 @@ std::string CreateCommand::Execute() {
             std::cerr << filename << " doesn't exist\n";
             continue;
         }
-        
-        PrintInArchive(archive, converter.TryConvert(offset));
 
         for (char k: filename) {
             PrintInArchive(archive, converter.TryConvert(k));
@@ -62,11 +62,10 @@ std::string CreateCommand::Execute() {
 
         file.seekg(0, std::ios::end);
         file_sizes.push_back(file.tellg());
-        offset += file.tellg();
+        PrintInArchive(archive, converter.TryConvert(file_sizes.back()));
         file.close();
     }
 
-    PrintInArchive(archive, converter.TryConvert(offset));
     converter.SetCoder(std::make_unique<HammingCoder>(control_bits_));
 
     for (uint32_t file_size : file_sizes) {

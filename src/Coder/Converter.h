@@ -8,14 +8,17 @@
 
 class Converter {
 public:
-    Converter() = default;
 
     explicit Converter(std::unique_ptr<Coder> coder);
 
     void SetCoder(std::unique_ptr<Coder> coder);
 
+    std::optional<std::string> TryConvert(const char* str, uint32_t size);
+
     template<typename T>
-    std::optional<std::string> TryConvert(T t);
+    std::optional<std::string> TryConvert(T t) {
+        return TryConvert(reinterpret_cast<char*>(&t), sizeof(t));
+    }
 
     std::string GetRemainder();
 

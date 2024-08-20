@@ -10,7 +10,13 @@ add_executable(HamArc main.cpp
         Parsers/OptionParsers/CommandsParser.cpp
         Parsers/ArgumentParsers/ControlBitsParser.cpp
         Builders/CreateCommandBuilder.cpp
-        Archivator/Converter.cpp
+        Coder/Converter.cpp
+        Coder/HammingCoder.cpp
+        Coder/ThreeBitsCoder.cpp
+        Coder/ThreeBitsDecoder.cpp
+        Coder/HammingCorrector.cpp
+        Archivator/ArchiveHeader.cpp
+        Archivator/ArchiveHeaderFactoryFromArchive.cpp
 )
 
 #target_link_libraries(HamArc Operations)
