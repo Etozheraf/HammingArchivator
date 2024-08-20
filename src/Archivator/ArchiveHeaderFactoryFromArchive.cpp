@@ -14,14 +14,15 @@ ArchiveHeader ArchiveHeaderFactoryFromArchive::Create() {
     if (opt.has_value()) haf = std::move(opt.value());
 
     Read(opt, 12);
-    uint32_t control_size;
+    uint32_t control_size = 0;
 
     if (opt.has_value())
         std::memcpy(&control_size, opt.value().data(), sizeof(control_size));
 
     Read(opt, 24);
-    uint64_t header_size;
-    if (opt.has_value()) header_size = std::stoull(opt.value());
+    uint64_t header_size = 0;
+    if (opt.has_value())
+        std::memcpy(&header_size, opt.value().data(), sizeof(header_size));
 
     std::vector<std::string> filenames;
     std::vector<uint64_t> file_sizes;
@@ -44,8 +45,9 @@ ArchiveHeader ArchiveHeaderFactoryFromArchive::Create() {
         Read(opt, 24);
         archive_pos += 24;
 
-        uint64_t file_size;
-        if (opt.has_value()) file_size = std::stoull(opt.value());
+        uint64_t file_size = 0;
+        if (opt.has_value())
+            std::memcpy(&file_size, opt.value().data(), sizeof(file_size));
         file_sizes.push_back(file_size);
     }
     return {haf, control_size, header_size, filenames, file_sizes};

@@ -28,8 +28,8 @@ void Converter::BitsToString(std::string& res) {
     while (total_.size() > 7) {
         uint8_t buf = 0;
         for (int i = 0; i < 8; ++i) {
-            buf |= total_.front();
             buf <<= 1;
+            buf |= total_.front();
             total_.pop_front();
         }
         res.push_back(static_cast<char>(buf));

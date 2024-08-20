@@ -12,7 +12,7 @@
 ListCommand::ListCommand(std::string archive_name) : archive_name_(std::move(archive_name)) {}
 
 std::string ListCommand::Execute() {
-    std::cout << "Listing files from archive " << archive_name_ << ": ";
+    std::cout << "Listing files from archive " << archive_name_ << "\n";
 
     std::ifstream archive(archive_name_, std::ios::binary);
     if (!archive.is_open()) {
