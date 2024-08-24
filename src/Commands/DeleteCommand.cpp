@@ -17,7 +17,14 @@ std::string DeleteCommand::Execute() {
 
     Converter converter(std::make_unique<ThreeBitsDecoder>());
     ArchiveHeaderFactoryFromArchive archive_header_factory(archive, converter);
-    ArchiveHeader archive_header = archive_header_factory.Create();
+    std::optional<ArchiveHeader> archive_header_opt = archive_header_factory.TryCreate();
+    if (!archive_header_opt.has_value()) {
+        return "Wrong file\n";
+    }
+    ArchiveHeader archive_header = archive_header_opt.value();
+    if (archive_header.GetHaf() != "HAF") {
+        return archive_name_ + " isn't archive";
+    }
 
     if (file_names_.empty()) {
         file_names_ = archive_header.GetFilenames();

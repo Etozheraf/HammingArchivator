@@ -6,11 +6,12 @@ class ArchiveHeaderFactoryFromArchive : public ArchiveHeaderFactory {
 public:
     ArchiveHeaderFactoryFromArchive(std::ifstream& archive, Converter& converter);
 
-    ArchiveHeader Create() override;
+    std::optional<ArchiveHeader> TryCreate() override;
 
 private:
+    std::optional<std::string> Read(uint32_t size);
 
-    void Read(std::optional<std::string>& opt, uint32_t size);
+    uint64_t GetUintFromString(const std::string& str);
 
     std::ifstream& archive_;
     Converter& converter_;

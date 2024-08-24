@@ -54,7 +54,11 @@ void ArchiveHeader::Print(std::ofstream& archive, Converter& converter) {
 
     for (int i = 0; i < filenames_.size(); ++i) {
         archive << converter.TryConvert(filenames_[i].c_str(), filenames_[i].size()).value();
-        archive << converter.TryConvert('\0').value();
+        archive << converter.TryConvert(static_cast<uint8_t>('\0')).value();
         archive << converter.TryConvert(file_sizes_[i]).value();
     }
+}
+
+std::string ArchiveHeader::GetHaf() const {
+    return haf_;
 }

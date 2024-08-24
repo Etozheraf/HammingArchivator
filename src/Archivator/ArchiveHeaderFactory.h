@@ -2,5 +2,5 @@
 
 class ArchiveHeaderFactory {
 public:
-    virtual ArchiveHeader Create() = 0;
+    virtual std::optional<ArchiveHeader> TryCreate() = 0;
 };

@@ -6,11 +6,6 @@ void Converter::SetCoder(std::unique_ptr<Coder> coder) {
     coder_ = std::move(coder);
 }
 
-//template<typename T>
-//std::optional<std::string> Converter::TryConvert(T t) {
-//    return TryConvert(static_cast<char*>(&t), sizeof(t));
-//}
-
 std::string Converter::GetRemainder() {
     while (!data_.empty()) {
         data_.push_back(false);
@@ -19,12 +14,12 @@ std::string Converter::GetRemainder() {
 
     while (total_.size() % 8) { total_.push_back(false); }
 
-    std::string result;
-    BitsToString(result);
-    return std::move(result);
+    return BitsToString().value();
 }
 
-void Converter::BitsToString(std::string& res) {
+std::optional<std::string> Converter::BitsToString() {
+    std::string result;
+    result.reserve(total_.size() / 8);
     while (total_.size() > 7) {
         uint8_t buf = 0;
         for (int i = 0; i < 8; ++i) {
@@ -32,8 +27,9 @@ void Converter::BitsToString(std::string& res) {
             buf |= total_.front();
             total_.pop_front();
         }
-        res.push_back(static_cast<char>(buf));
+        result.push_back(static_cast<char>(buf));
     }
+    return std::move(result);
 }
 
 std::optional<std::string> Converter::TryConvert(const char* str, uint32_t size) {
@@ -49,8 +45,6 @@ std::optional<std::string> Converter::TryConvert(const char* str, uint32_t size)
 
     if (total_.size() < 8) return {};
 
-    std::string result;
-    result.reserve(total_.size() / 8);
-    BitsToString(result);
-    return std::move(result);
+    return std::move(BitsToString());
 }
+

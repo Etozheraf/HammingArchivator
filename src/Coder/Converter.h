@@ -1,9 +1,11 @@
 #pragma once
+
 #include "Coder.h"
 #include <string>
 #include <memory>
 #include <optional>
 #include <deque>
+#include <concepts>
 
 
 class Converter {
@@ -15,15 +17,25 @@ public:
 
     std::optional<std::string> TryConvert(const char* str, uint32_t size);
 
-    template<typename T>
+    template<std::unsigned_integral T>
     std::optional<std::string> TryConvert(T t) {
-        return TryConvert(reinterpret_cast<char*>(&t), sizeof(t));
+        constexpr T t_max_pow2 = static_cast<T>(-1) - static_cast<T>(-1) / 2 ;
+
+        for (T j = t_max_pow2; j > 0; j /= 2) {
+            data_.push_back(t / j % 2);
+        }
+
+        while (coder_->Code(total_, data_));
+
+        if (total_.size() < 8) return {};
+
+        return std::move(BitsToString());
     }
 
     std::string GetRemainder();
 
 private:
-    void BitsToString(std::string& res);
+    std::optional<std::string> BitsToString();
 
     std::unique_ptr<Coder> coder_;
     std::deque<bool> data_;

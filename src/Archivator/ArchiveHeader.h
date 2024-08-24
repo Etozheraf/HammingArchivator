@@ -30,6 +30,8 @@ public:
                   std::vector<std::string> filenames,
                   std::vector<uint64_t> file_sizes);
 
+    std::string GetHaf() const;
+
     uint32_t GetControlBits() const;
 
     uint64_t GetHeaderSize() const;
