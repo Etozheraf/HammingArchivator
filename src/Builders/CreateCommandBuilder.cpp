@@ -11,13 +11,13 @@ std::string CreateCommandBuilder::ShowErrors() {
         errors += "Archive name is empty\n";
     if (file_names_.empty())
         errors += "File names are empty\n";
-    if (control_bits_ == 0)
+    if (control_bits_ < 2)
         errors += "Control bits don't initialized\n";
     return errors;
 }
 
 CreateCommand* CreateCommandBuilder::TryBuild() {
-    if (archive_name_.empty() || file_names_.empty() || control_bits_ == 0)
+    if (archive_name_.empty() || file_names_.empty() || control_bits_ < 2)
         return nullptr;
 
     return new CreateCommand(archive_name_, control_bits_, file_names_);

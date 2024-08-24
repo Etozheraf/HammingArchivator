@@ -3,6 +3,7 @@
 #include "../Coder/Converter.h"
 #include "../Coder/HammingCoder.h"
 #include "../Coder/ThreeBitsCoder.h"
+#include "../Archivator/ArchiveHeader.h"
 #include <memory>
 #include <optional>
 
@@ -29,21 +30,8 @@ CreateCommand::CreateCommand(std::string archive_name, int control_bits,
           file_names_(std::move(file_names)) {}
 
 std::string CreateCommand::Execute() {
-
-    uint64_t header_size = 3 + 4 + 4; // for HAF, control bits, file size
-
-    for (auto& filename: file_names_) {
-        header_size += filename.size() + 1 + 4; // for name, '/0', header_size
-    }
-
     std::ofstream archive(archive_name_, std::ofstream::binary);
     Converter converter(std::make_unique<ThreeBitsCoder>());
-
-    PrintInArchive(archive, converter.TryConvert("HAF", 3));
-    
-    PrintInArchive(archive, converter.TryConvert(control_bits_));
-
-    PrintInArchive(archive, converter.TryConvert(header_size));
 
     std::vector<uint64_t> file_sizes;
     file_sizes.reserve(file_names_.size());
@@ -55,16 +43,12 @@ std::string CreateCommand::Execute() {
             continue;
         }
 
-        for (char k: filename) {
-            PrintInArchive(archive, converter.TryConvert(k));
-        }
-        PrintInArchive(archive, converter.TryConvert('\0'));
-
         file.seekg(0, std::ios::end);
         file_sizes.push_back(file.tellg());
-        PrintInArchive(archive, converter.TryConvert(file_sizes.back()));
         file.close();
     }
+    ArchiveHeader archive_head(control_bits_, file_names_, file_sizes);
+    archive_head.Print(archive, converter);
 
     converter.SetCoder(std::make_unique<HammingCoder>(control_bits_));
 

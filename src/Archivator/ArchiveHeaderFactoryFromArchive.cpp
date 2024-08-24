@@ -50,7 +50,7 @@ ArchiveHeader ArchiveHeaderFactoryFromArchive::Create() {
             std::memcpy(&file_size, opt.value().data(), sizeof(file_size));
         file_sizes.push_back(file_size);
     }
-    return {haf, control_size, header_size, filenames, file_sizes};
+    return {haf, control_size, header_size, std::move(filenames), std::move(file_sizes)};
 }
 
 void ArchiveHeaderFactoryFromArchive::Read(std::optional<std::string>& opt, uint32_t size) {
