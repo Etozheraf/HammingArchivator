@@ -62,3 +62,41 @@ void ArchiveHeader::Print(std::ofstream& archive, Converter& converter) {
 std::string ArchiveHeader::GetHaf() const {
     return haf_;
 }
+
+void ArchiveHeader::GetOffsets(std::unordered_map<std::string, uint64_t>& file_begins,
+                               std::unordered_map<std::string, uint64_t>& file_ends) const {
+
+    const int block_size = (1 << control_bits_) - 1;
+    const int data_size = block_size - control_bits_;
+
+    file_begins[filenames_[0]] = header_size_ * 3;
+
+    for (int i = 0; i < filenames_.size() - 1; ++i) {
+        uint64_t hamming_file_size =
+                ((((file_sizes_[i] * 8 - 1) / data_size + 1) * block_size - 1) / 8 + 1);
+
+        file_ends[filenames_[i]] = file_begins[filenames_[i]] + hamming_file_size;
+        file_begins[filenames_[i + 1]] = file_ends[filenames_[i]];
+    }
+    uint64_t hamming_file_size =
+            ((((file_sizes_.back() * 8 - 1) / data_size + 1) * block_size - 1) / 8 + 1);
+    file_ends[filenames_.back()] = file_begins[filenames_.back()] + hamming_file_size;
+}
+
+std::vector<std::string> ArchiveHeader::GetContainedFilenamesFrom(const std::vector<std::string>& names) const {
+    std::unordered_map<std::string, bool> is_have;
+    for (const auto& filename: names) {
+        is_have[filename] = false;
+    }
+    for (const auto& filename: filenames_) {
+        is_have[filename] = true;
+    }
+
+    std::vector<std::string> answer;
+    answer.reserve(names.size());
+    for (auto& name : names) {
+        if (is_have[name])
+            answer.push_back(name);
+    }
+    return std::move(answer);
+}

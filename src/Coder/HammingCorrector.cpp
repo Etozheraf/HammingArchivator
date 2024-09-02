@@ -20,5 +20,5 @@ void HammingCorrector::Correction(std::deque<bool>& total) const {
         index_of_error += control_bit + 1;
     }
     if (index_of_error == 0) return;
-    total[index_of_error - 1] = !total[index_of_error];
+    total[index_of_error - 1] = !total[index_of_error - 1];
 }

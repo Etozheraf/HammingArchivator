@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <fstream>
+#include <unordered_map>
 #include "../Coder/Converter.h"
 
 /*
@@ -40,7 +41,12 @@ public:
 
     const std::vector<std::string>& GetFilenames() const;
 
+    std::vector<std::string> GetContainedFilenamesFrom(const std::vector<std::string>& names) const;
+
     const std::vector<uint64_t>& GetFileSizes() const;
+
+    void GetOffsets(std::unordered_map<std::string, uint64_t>& file_begins,
+                    std::unordered_map<std::string, uint64_t>& file_ends) const;
 
     void Print(std::ofstream& archive, Converter& converter);
 

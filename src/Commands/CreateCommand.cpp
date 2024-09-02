@@ -39,7 +39,7 @@ std::string CreateCommand::Execute() {
         std::ifstream file(filename, std::ofstream::binary);
 
         if (!file.is_open()) {
-            std::cerr << filename << " doesn't exist\n";
+            std::cout << filename << " doesn't exist\n";
             continue;
         }
 
@@ -52,22 +52,18 @@ std::string CreateCommand::Execute() {
 
     converter.SetCoder(std::make_unique<HammingCoder>(control_bits_));
 
-    for (uint32_t file_size : file_sizes) {
-        std::ifstream file(file_names_.front(), std::ofstream::binary);
+    for (uint32_t i = 0; i < file_sizes.size(); ++i) {
+        std::ifstream file(file_names_[i], std::ofstream::binary);
 
-        for (int i = 0; i < file_size; ++i) {
+        for (int j = 0; j < file_sizes[i]; ++j) {
             uint8_t buf = 0;
             file.read((char*) &buf, sizeof(buf));
-            PrintInArchive(archive, converter.TryConvert(buf));
+            auto coded_buf = converter.TryConvert(buf);
+            if (!coded_buf.has_value()) continue;
+            archive << coded_buf.value();
         }
 
         archive << converter.GetRemainder();
     }
     return "";
-}
-
-void CreateCommand::PrintInArchive(std::ofstream& archive, const std::optional<std::string>& s) {
-    if (s.has_value()) {
-        archive << s.value();
-    }
 }

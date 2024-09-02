@@ -17,8 +17,6 @@ public:
 
 private:
 
-    void PrintInArchive(std::ofstream& archive, const std::optional<std::string>& s);
-
     const std::string archive_name_;
     const uint32_t control_bits_;
     const std::vector<std::string> file_names_;

@@ -1,5 +1,4 @@
 #include <iostream>
-#include <cstring>
 #include "ArchiveHeaderFactoryFromArchive.h"
 
 ArchiveHeaderFactoryFromArchive::ArchiveHeaderFactoryFromArchive(
@@ -35,7 +34,7 @@ std::optional<ArchiveHeader> ArchiveHeaderFactoryFromArchive::TryCreate() {
             archive_pos += 3;
 
             char_0 = opt->front();
-            filename.push_back(char_0);
+            if (char_0 != '\0') filename.push_back(char_0);
         }
         filenames.push_back(std::move(filename));
 

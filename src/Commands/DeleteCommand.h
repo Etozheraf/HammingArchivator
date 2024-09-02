@@ -14,15 +14,9 @@ public:
     std::string Execute() override;
 
 private:
-    void CountOffsets(
-            std::unordered_map<std::string, uint64_t>& begins,
-            std::unordered_map<std::string, uint64_t>& ends,
-            const ArchiveHeader& archive_header);
 
-    std::vector<uint64_t> CountFileSizes(const ArchiveHeader& archive_header);
-
-    void ClearFilenames(const ArchiveHeader& archive_header);
+    void UpdateArchiveHeader(ArchiveHeader& archive_header);
 
     std::string archive_name_;
-    std::vector<std::string> file_names_;
+    std::vector<std::string> deleted_filenames_;
 };

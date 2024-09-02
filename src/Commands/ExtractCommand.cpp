@@ -1,17 +1,20 @@
+#include <algorithm>
 #include "ExtractCommand.h"
 #include "../Coder/Converter.h"
 #include "../Coder/ThreeBitsDecoder.h"
 #include "../Archivator/ArchiveHeaderFactoryFromArchive.h"
+#include "../Coder/HammingDecoder.h"
 
 ExtractCommand::ExtractCommand(std::string archive_name, std::vector<std::string> file_names)  :
         archive_name_(std::move(archive_name)),
-        file_names_(std::move(file_names)) {}
+        extracted_filenames_(std::move(file_names)) {}
 
 std::string ExtractCommand::Execute() {
     std::cout << "Extracting files from archive " << archive_name_ << ": ";
-    for (const auto& fileName : file_names_) {
+    for (const auto& fileName : extracted_filenames_) {
         std::cout << fileName << ", ";
     }
+    std::cout << "\n";
 
     std::ifstream archive(archive_name_, std::ios::binary);
     if (!archive.is_open()) {
@@ -28,6 +31,31 @@ std::string ExtractCommand::Execute() {
     ArchiveHeader archive_header = archive_header_opt.value();
     if (archive_header.GetHaf() != "HAF") {
         return archive_name_ + " isn't archive";
+    }
+
+    std::unordered_map<std::string, uint64_t> file_begins;
+    std::unordered_map<std::string, uint64_t> file_ends;
+    archive_header.GetOffsets(file_begins, file_ends);
+
+    extracted_filenames_ = archive_header.GetContainedFilenamesFrom(extracted_filenames_);
+    if (extracted_filenames_.empty()) {
+        return "";
+    }
+
+    converter.SetCoder(std::make_unique<HammingDecoder>(archive_header.GetControlBits()));
+    for (auto& extracted_filename : extracted_filenames_) {
+        archive.seekg(file_begins[extracted_filename]);
+        std::ofstream file(extracted_filename, std::ios::binary);
+        for (uint64_t i = file_begins[extracted_filename]; i < file_ends[extracted_filename]; ++i) {
+            char buf;
+            archive >> buf;
+            auto decoded_buf = converter.TryConvert(static_cast<uint8_t>(buf));
+            if (!decoded_buf.has_value()) {
+                continue;
+            }
+            file << decoded_buf.value();
+        }
+        converter.GetRemainder();
     }
 
     return "";

@@ -12,6 +12,7 @@ add_executable(HamArc main.cpp
         Builders/CreateCommandBuilder.cpp
         Coder/Converter.cpp
         Coder/HammingCoder.cpp
+        Coder/HammingDecoder.cpp
         Coder/ThreeBitsCoder.cpp
         Coder/ThreeBitsDecoder.cpp
         Coder/HammingCorrector.cpp
