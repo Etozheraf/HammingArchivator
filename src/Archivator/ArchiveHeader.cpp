@@ -83,7 +83,8 @@ void ArchiveHeader::GetOffsets(std::unordered_map<std::string, uint64_t>& file_b
     file_ends[filenames_.back()] = file_begins[filenames_.back()] + hamming_file_size;
 }
 
-std::vector<std::string> ArchiveHeader::GetContainedFilenamesFrom(const std::vector<std::string>& names) const {
+std::vector<std::string> ArchiveHeader::GetContainedFilenamesFrom(const std::vector<std::string>& names,
+                                                                  std::vector<std::string>& not_contained_names) const {
     std::unordered_map<std::string, bool> is_have;
     for (const auto& filename: names) {
         is_have[filename] = false;
@@ -94,9 +95,11 @@ std::vector<std::string> ArchiveHeader::GetContainedFilenamesFrom(const std::vec
 
     std::vector<std::string> answer;
     answer.reserve(names.size());
-    for (auto& name : names) {
+    for (auto& name: names) {
         if (is_have[name])
             answer.push_back(name);
+        else
+            not_contained_names.push_back(name);
     }
     return std::move(answer);
 }

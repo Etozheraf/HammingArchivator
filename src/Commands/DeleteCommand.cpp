@@ -34,13 +34,18 @@ std::string DeleteCommand::Execute() {
     std::unordered_map<std::string, uint64_t> file_ends;
     archive_header.GetOffsets(file_begins, file_ends);
 
-    deleted_filenames_ = archive_header.GetContainedFilenamesFrom(deleted_filenames_);
+    std::vector<std::string> not_contained_filenames;
+    deleted_filenames_ = archive_header.GetContainedFilenamesFrom(deleted_filenames_, not_contained_filenames);
+    for (const auto& not_contained_filename: not_contained_filenames) {
+        std::cout << not_contained_filename << " file isn't in archive";
+    }
 
     if (deleted_filenames_.empty()) {
         return "";
     }
 
     if (deleted_filenames_.size() == archive_header.GetFilenames().size()) {
+        archive.close();
         std::remove(archive_name_.data());
         return "";
     }

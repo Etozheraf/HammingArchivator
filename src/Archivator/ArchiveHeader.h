@@ -41,7 +41,8 @@ public:
 
     const std::vector<std::string>& GetFilenames() const;
 
-    std::vector<std::string> GetContainedFilenamesFrom(const std::vector<std::string>& names) const;
+    std::vector<std::string> GetContainedFilenamesFrom(const std::vector<std::string>& names,
+                                                       std::vector<std::string>& not_contained_names) const;
 
     const std::vector<uint64_t>& GetFileSizes() const;
 

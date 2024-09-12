@@ -60,7 +60,7 @@ std::string CreateCommand::Execute() {
             file.read((char*) &buf, sizeof(buf));
             auto coded_buf = converter.TryConvert(buf);
             if (!coded_buf.has_value()) continue;
-            archive << coded_buf.value();
+            archive.write(coded_buf.value().c_str(), coded_buf.value().size());
         }
 
         archive << converter.GetRemainder();

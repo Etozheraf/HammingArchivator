@@ -5,13 +5,13 @@
 #include "../Archivator/ArchiveHeaderFactoryFromArchive.h"
 #include "../Coder/HammingDecoder.h"
 
-ExtractCommand::ExtractCommand(std::string archive_name, std::vector<std::string> file_names)  :
+ExtractCommand::ExtractCommand(std::string archive_name, std::vector<std::string> file_names) :
         archive_name_(std::move(archive_name)),
         extracted_filenames_(std::move(file_names)) {}
 
 std::string ExtractCommand::Execute() {
     std::cout << "Extracting files from archive " << archive_name_ << ": ";
-    for (const auto& fileName : extracted_filenames_) {
+    for (const auto& fileName: extracted_filenames_) {
         std::cout << fileName << ", ";
     }
     std::cout << "\n";
@@ -37,13 +37,18 @@ std::string ExtractCommand::Execute() {
     std::unordered_map<std::string, uint64_t> file_ends;
     archive_header.GetOffsets(file_begins, file_ends);
 
-    extracted_filenames_ = archive_header.GetContainedFilenamesFrom(extracted_filenames_);
+    std::vector<std::string> not_contained_filenames;
+    extracted_filenames_ = archive_header.GetContainedFilenamesFrom(extracted_filenames_, not_contained_filenames);
+    for (const auto& not_contained_filename: not_contained_filenames) {
+        std::cout << not_contained_filename << " file isn't in archive";
+    }
+
     if (extracted_filenames_.empty()) {
         return "";
     }
 
     converter.SetCoder(std::make_unique<HammingDecoder>(archive_header.GetControlBits()));
-    for (auto& extracted_filename : extracted_filenames_) {
+    for (auto& extracted_filename: extracted_filenames_) {
         archive.seekg(file_begins[extracted_filename]);
         std::ofstream file(extracted_filename, std::ios::binary);
         for (uint64_t i = file_begins[extracted_filename]; i < file_ends[extracted_filename]; ++i) {
