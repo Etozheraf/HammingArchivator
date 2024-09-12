@@ -12,5 +12,5 @@ public:
 
 private:
     std::string archive_name_;
-    std::vector<std::string> file_names_;
+    std::vector<std::string> appended_filenames_;
 };
