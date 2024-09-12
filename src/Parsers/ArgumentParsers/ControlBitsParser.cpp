@@ -15,7 +15,7 @@ bool ControlBitsParser::Parse(std::vector<std::string>& request, std::unique_ptr
         concrete_builder->SetControlBits(0);
         request.erase(request.begin(), request.begin() + 1);
         return next_parser_->Parse(request, builder);
-    };
+    }
 
     concrete_builder->SetControlBits(std::stoi(request[0]));
     request.erase(request.begin(), request.begin() + 1);

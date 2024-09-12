@@ -7,18 +7,6 @@
 #include <unordered_map>
 #include "../Coder/Converter.h"
 
-/*
-header:
-HAF 3
-control bits 4
-offset1 8
-filename1 n1
-offset2 8
-filename2 n2
-...
-file_size 8
-*/
-
 class ArchiveHeader {
 public:
     ArchiveHeader(uint32_t control_bits,

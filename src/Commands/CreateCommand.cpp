@@ -6,18 +6,6 @@
 #include <memory>
 #include <optional>
 
-/*
-header:
-HAF 3
-control bits 4
-offset1 8
-filename1 n1
-offset2 8
-filename2 n2
-...
-file_size 8
-*/
-
 CreateCommand::CreateCommand(std::string archive_name,
                              std::vector<std::string> file_names)
         : archive_name_(std::move(archive_name)), control_bits_(3),

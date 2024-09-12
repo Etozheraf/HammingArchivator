@@ -1,12 +1,10 @@
 #include "ListCommand.hpp"
 #include "../Coder/Converter.h"
-#include "../Coder/HammingCoder.h"
 #include "../Coder/ThreeBitsDecoder.h"
 #include "../Archivator/ArchiveHeaderFactoryFromArchive.h"
 #include <string>
 #include <cstdint>
 #include <fstream>
-#include <deque>
 #include <memory>
 #include <optional>
 

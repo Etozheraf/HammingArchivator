@@ -15,18 +15,6 @@
 #include <iostream>
 #include <memory>
 
-/*
-header:
-HAF 3
-control bits 4
-offset1 4
-filename1 n1
-offset2 4
-filename2 n2
-...
-file_size 4
- */
-
 int main(int argc, char* argv[]) {
     Parser parser;
     std::unique_ptr<CommandsParser> commands_parser = std::make_unique<CommandsParser>();
