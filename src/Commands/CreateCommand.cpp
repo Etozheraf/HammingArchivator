@@ -1,5 +1,4 @@
 #include "CreateCommand.h"
-#include "Queue.h"
 #include "../Coder/Converter.h"
 #include "../Coder/HammingCoder.h"
 #include "../Coder/ThreeBitsCoder.h"
